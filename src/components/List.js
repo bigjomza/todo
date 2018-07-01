@@ -12,7 +12,10 @@ class List extends Component {
           overflowX: "hidden"
         }}
       >
-        <ListItems todos={this.props.todos} />
+        <ListItems
+          todos={this.props.todos}
+          onChaneBox={this.props.onChaneBox}
+        />
       </div>
     );
   }

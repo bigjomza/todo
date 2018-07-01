@@ -2,21 +2,29 @@ import React, { Component } from "react";
 import FormSubmit from "./components/FormSubmit";
 import List from "./components/List";
 import HeaderComponents from "./components/HeaderComponents";
+import Axios from "axios";
+
+const URL = "https://bigjomza-server.herokuapp.com";
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      todos: [
-        { id: 1, name: "Raft", complete: false },
-        { id: 2, name: "The Forest", complete: false }
-      ],
+      todos: [],
       message: ""
     };
 
     this.onChangMessage = this.onChangMessage.bind(this);
     this.onSubmitMessage = this.onSubmitMessage.bind(this);
+    this.onChaneBox = this.onChaneBox.bind(this);
   }
+
+  componentDidMount = () => {
+    Axios.get("/todos").then(response => {
+      this.setState({ todos: response.data });
+    });
+  };
+
   onChangMessage(e) {
     this.setState({ message: e.target.value });
   }
@@ -24,16 +32,23 @@ class App extends Component {
   onSubmitMessage(e) {
     //ป้องกันการรีโหลดหน้า
     e.preventDefault();
-    let oldTodos = this.state.todos;
-    let todoLength = this.state.todos.length;
-    let lastId = this.state.todos[todoLength - 1].id;
-    let newMessage = {
-      id: lastId + 1,
+    Axios.post(URL + "/todos", {
       name: this.state.message,
       complete: false
-    };
-    oldTodos.push(newMessage);
-    this.setState({ todos: oldTodos });
+    }).then(response => {
+      let oldState = this.state.todos;
+      oldState.push(response.data);
+      this.setState({ todos: oldState });
+    });
+  }
+
+  onChaneBox(index, id) {
+    let check = this.state.todos[index].complete;
+    Axios.patch(URL + "/todos/" + id, { complete: !check }).then(response => {
+      let oldState= this.state.todos;
+      oldState[index] = !check;
+      this.setState({todos: oldState});
+      });
   }
 
   render() {
@@ -50,7 +65,7 @@ class App extends Component {
         }}
       >
         <HeaderComponents />
-        <List todos={this.state.todos} />
+        <List todos={this.state.todos} onChaneBox={this.onChaneBox} />
         <FormSubmit
           onChangMessage={this.onChangMessage}
           onSubmitMessage={this.onSubmitMessage}

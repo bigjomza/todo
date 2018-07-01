@@ -4,7 +4,7 @@ class ListItems extends Component {
   render() {
     return (
       <div>
-        {this.props.todos.map(item => (
+        {this.props.todos.map((item, index) => (
           <div
             style={{
               backgroundColor: "#fefefe",
@@ -19,7 +19,11 @@ class ListItems extends Component {
             }}
             key={item.id}
           >
-            <input type="checkbox" />
+            <input
+              onChange={() => this.props.onChaneBox(index, item.id)}
+              type="checkbox"
+              checked={item.complete}
+            />
             {item.name}
           </div>
         ))}
